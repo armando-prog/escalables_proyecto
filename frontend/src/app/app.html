@@ -1,0 +1,179 @@
+<main class="store">
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Raíz Local, inicio">
+      <span class="brand-mark" aria-hidden="true">r.</span>
+      <span>raíz local</span>
+    </a>
+    <nav aria-label="Navegación principal">
+      <a class="nav-link" href="#catalogo">Catálogo</a>
+      <span class="nav-note">Hecho cerca, hecho con calma.</span>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow"><span aria-hidden="true"></span> OBJETOS CON HISTORIA</p>
+      <h1>Hecho a mano.<br /><span>Hecho para durar.</span></h1>
+      <p class="hero-description">
+        Piezas creadas por manos locales, para acompañarte todos los días.
+        Encuentra algo que se sienta un poco más tuyo.
+      </p>
+      <a class="hero-link" href="#catalogo">Explorar la colección <span aria-hidden="true">↓</span></a>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="sun"></div>
+      <div class="vase vase-back"></div>
+      <div class="vase vase-front"></div>
+      <div class="branch branch-one"></div>
+      <div class="branch branch-two"></div>
+      <span class="art-caption">pequeñas cosas,<br />hechas con intención</span>
+    </div>
+    <div class="hero-bottom">
+      <span>01 — piezas de talleres independientes</span>
+      <span>Una colección, muchas historias</span>
+    </div>
+  </section>
+
+  <section id="catalogo" class="catalog-section" aria-labelledby="catalog-title">
+    <div class="section-intro">
+      <div>
+        <p class="eyebrow">LA COLECCIÓN</p>
+        <h2 id="catalog-title">Un hogar para lo hecho a mano.</h2>
+      </div>
+      <p class="section-copy">Explora textiles, cerámica y detalles creados en pequeños talleres.</p>
+    </div>
+
+    <div class="catalog-controls">
+      <label class="search-box">
+        <span aria-hidden="true">⌕</span>
+        <input
+          type="search"
+          name="buscar"
+          placeholder="Buscar una pieza..."
+          aria-label="Buscar productos"
+          [ngModel]="catalogo.buscar()"
+          (ngModelChange)="catalogo.buscar.set($event)"
+        />
+      </label>
+      <div class="category-filters" aria-label="Filtrar por categoría">
+        <button
+          type="button"
+          [class.active]="catalogo.categoriaActiva() === null"
+          (click)="catalogo.categoriaActiva.set(null)"
+        >
+          Todo
+        </button>
+        @for (categoria of catalogo.categorias(); track categoria._id) {
+          <button
+            type="button"
+            [class.active]="catalogo.categoriaActiva() === categoria._id"
+            (click)="catalogo.categoriaActiva.set(categoria._id)"
+          >
+            {{ categoria.nombre }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (catalogo.error()) {
+      <div class="notice notice-error" role="alert">
+        <span>{{ catalogo.error() }}</span>
+        <button type="button" (click)="catalogo.cargarCatalogo()">Reintentar</button>
+      </div>
+    }
+
+    @if (catalogo.cargando()) {
+      <div class="empty-state" role="status">Preparando el catálogo...</div>
+    } @else if (catalogo.productosVisibles().length === 0) {
+      <div class="empty-state">
+        <span aria-hidden="true">✳</span>
+        <h3>{{ catalogo.error() ? 'La colección no está disponible' : 'Aún no hay piezas en esta selección' }}</h3>
+        <p>Prueba otra búsqueda o vuelve a explorar todas las categorías.</p>
+      </div>
+    } @else {
+      <div class="product-grid">
+        @for (producto of catalogo.productosVisibles(); track producto._id; let index = $index) {
+          <button
+            class="product-card"
+            type="button"
+            (click)="abrirProducto(producto)"
+            [attr.aria-label]="'Ver detalles de ' + producto.nombre"
+          >
+            <span [class]="'product-image tone-' + (index % 4)">
+              @if (producto.imagenUrl) {
+                <img [src]="producto.imagenUrl" [alt]="producto.nombre" loading="lazy" />
+              } @else {
+                <span class="product-illustration" aria-hidden="true">✳</span>
+              }
+              @if (producto.stock > 0) {
+                <span class="stock-label">Disponible</span>
+              } @else {
+                <span class="stock-label sold-out">Agotado</span>
+              }
+            </span>
+            <span class="product-info">
+              <span class="product-category">{{ producto.categoria?.nombre }}</span>
+              <span class="product-name">{{ producto.nombre }}</span>
+              <span class="product-bottom">
+                <span class="product-price">{{ producto.precio | currency:'MXN':'symbol-narrow':'1.0-0' }}</span>
+                <span class="view-label">Ver pieza <span aria-hidden="true">↗</span></span>
+              </span>
+            </span>
+          </button>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="promise">
+    <p class="eyebrow">DETALLES QUE IMPORTAN</p>
+    <div class="promise-grid">
+      <article>
+        <span>01</span>
+        <h3>Hecho por personas</h3>
+        <p>Cada pieza nace en un taller, no en una línea de producción.</p>
+      </article>
+      <article>
+        <span>02</span>
+        <h3>Pequeñas colecciones</h3>
+        <p>Elegimos objetos útiles, honestos y con materiales duraderos.</p>
+      </article>
+      <article>
+        <span>03</span>
+        <h3>Cerca de casa</h3>
+        <p>Una forma sencilla de conocer y apoyar el trabajo local.</p>
+      </article>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <a class="brand" href="/" aria-label="Raíz Local, inicio">
+      <span class="brand-mark" aria-hidden="true">r.</span>
+      <span>raíz local</span>
+    </a>
+    <p>Una tienda pequeña para encontrar algo especial.</p>
+    <span>Aplicaciones Web Escalables · Proyecto en desarrollo</span>
+  </footer>
+</main>
+
+@if (productoSeleccionado(); as producto) {
+  <div class="modal-backdrop" (click)="cerrarProducto()">
+    <section
+      class="product-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="product-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <button class="modal-close" type="button" aria-label="Cerrar detalles" (click)="cerrarProducto()">×</button>
+      <p class="eyebrow">{{ producto.categoria?.nombre }}</p>
+      <h2 id="product-modal-title">{{ producto.nombre }}</h2>
+      <p class="modal-description">{{ producto.descripcion }}</p>
+      <div class="modal-meta">
+        <span>{{ producto.precio | currency:'MXN':'symbol-narrow':'1.0-0' }}</span>
+        <span>{{ producto.stock > 0 ? producto.stock + ' disponibles' : 'Agotado' }}</span>
+      </div>
+      <button class="modal-done" type="button" (click)="cerrarProducto()">Volver al catálogo</button>
+    </section>
+  </div>
+}
